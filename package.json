@@ -13,6 +13,7 @@
     "render": "tsx scripts/render.ts",
     "render:demo": "tsx scripts/render.ts examples/carousel.json",
     "test:content": "tsx scripts/test-content.ts",
+    "test:image-security": "tsx scripts/test-image-security.ts",
     "preapi": "npm run generate:schema",
     "api": "tsx api/server.ts",
     "preapi:dev": "npm run generate:schema",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "fastify": "latest",
+    "ipaddr.js": "^2.5.0",
     "react": "latest",
     "react-dom": "latest",
     "sharp": "^0.35.4",

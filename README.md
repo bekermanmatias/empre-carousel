@@ -9,6 +9,7 @@ npm install
 npm run dev
 npm run check
 npm run test:content
+npm run test:image-security
 npm run render:demo
 npm run render -- examples/demo-real.json
 ```
@@ -84,7 +85,7 @@ Un render correcto devuelve:
 }
 ```
 
-Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. Antes de abrir Chromium, `/render` prepara internamente cada `image.url`: acepta sólo HTTP(S) público, controla redirects, timeout y 15 MB, valida el binario con Sharp y lo guarda como JPEG sRGB estable en `output/prepared/`. Una descarga 401/403/404, HTML o una imagen que no completa su carga devuelve `image_load_error` y el job queda inválido, sin screenshot de esa slide.
+Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. Antes de abrir Chromium, `/render` prepara internamente cada `image.url`: acepta sólo HTTP(S) público, controla redirects, timeout y 15 MB, valida el binario con Sharp y lo guarda como JPEG sRGB estable en `output/prepared/`. La protección SSRF resuelve todos los registros A/AAAA en modo verbatim y bloquea rangos privados, link-local, multicast, loopback e IPv4-mapped privados. Una descarga fallida devuelve `image_load_error` con códigos como `PRIVATE_IP`, `REDIRECT_TO_PRIVATE_IP`, `HTTP_403`, `INVALID_CONTENT_TYPE` o `TIMEOUT`; es un resultado HTTP 200 inválido y recuperable para n8n, sin screenshot de esa slide.
 
 ### Auto-fit controlado de T06
 

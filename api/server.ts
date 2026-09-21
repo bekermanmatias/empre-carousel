@@ -10,7 +10,7 @@ import { carouselJsonSchema } from '../src/schemas/jsonSchema'
 import { renderCarousel, type RenderWarning } from '../src/renderer/renderCarousel'
 import { inspectImageUrl } from '../src/images/inspectImage'
 import { fitForTemplate, orientationFor, recommendedObjectPosition, type TemplateName } from '../src/renderer/imageMetrics'
-import { prepareImage, preparedImagePath, type PreparedImage } from '../src/images/prepareImage'
+import { ImagePreparationError, prepareImage, preparedImagePath, type PreparedImage } from '../src/images/prepareImage'
 
 const app=Fastify({logger:true,trustProxy:true})
 const jobsRoot=resolve('output','jobs')
@@ -29,6 +29,7 @@ const publicBaseUrl=(request:{protocol:string;headers:{host?:string}}) => {
   if (configured) return configured
   return `${request.protocol}://${request.headers.host ?? 'localhost'}`
 }
+const imageErrorCode=(error:unknown) => error instanceof ImagePreparationError ? error.code : 'IMAGE_PREPARATION_FAILED'
 
 async function exportPngAsJpeg(browser:Awaited<ReturnType<typeof chromium.launch>>,source:string,target:string) {
   const image=await readFile(source)
@@ -63,7 +64,7 @@ app.post('/prepare-image',async(request,reply)=>{
   const parsed=prepareImageSchema.safeParse(request.body)
   if (!parsed.success) return reply.code(400).send({valid:false,errors:errors(parsed.error.issues)})
   try { return await prepareImage(parsed.data.url,parsed.data.template,parsed.data.objectPosition,publicBaseUrl(request)) }
-  catch (error) { request.log.warn(error,'image preparation failed'); return reply.code(400).send({valid:false,sourceUrl:parsed.data.url,error:error instanceof Error ? error.message : 'No se pudo preparar la imagen'}) }
+  catch (error) { request.log.warn(error,'image preparation failed'); return reply.code(400).send({valid:false,sourceUrl:parsed.data.url,error:imageErrorCode(error)}) }
 })
 
 app.post('/validate',async(request,reply)=>{
@@ -85,9 +86,9 @@ app.post('/render',async(request,reply)=>{
       if (!slide.image) { prepared.push(undefined); continue }
       try { prepared.push(await prepareImage(slide.image.url,slide.template as TemplateName,slide.image.objectPosition,publicBaseUrl(request))) }
       catch (error) {
-        const warning={field:'image',type:'image_load_error' as const,position:slide.position,url:slide.image.url,error:error instanceof Error ? error.message : 'image_prepare_error'}
+        const warning={field:'image',type:'image_load_error' as const,position:slide.position,url:slide.image.url,error:imageErrorCode(error)}
         await writeFile(resolve(directory,'render-report.json'),JSON.stringify({version:parsed.data.version,valid:false,slides:parsed.data.slides.map(candidate=>({template:candidate.template,position:candidate.position,valid:false,warnings:candidate===slide?[warning]:[],autoFits:[],textMetrics:[],imageMetrics:candidate===slide?{sourceUrl:slide.image!.url,loaded:false,error:warning.error}:undefined,dimensions:{width:1080,height:1350},file:`${String(candidate.position ?? 0).padStart(2,'0')}.png`}))},null,2)+'\n')
-        return reply.code(400).send({success:false,jobId,valid:false,slideCount:parsed.data.slides.length,files:[],warnings:[warning]})
+        return {success:false,jobId,valid:false,slideCount:parsed.data.slides.length,files:[],warnings:[warning]}
       }
     }
     const renderInput={...parsed.data,slides:parsed.data.slides.map((slide,index)=>slide.image && prepared[index] ? {...slide,image:{...slide.image,url:prepared[index].url,objectPosition:slide.image.objectPosition ?? prepared[index].recommendedObjectPosition}} : slide)}
