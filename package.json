@@ -18,6 +18,21 @@
     "preapi:dev": "npm run generate:schema",
     "api:dev": "tsx watch api/server.ts"
   },
-  "dependencies": { "@vitejs/plugin-react": "latest", "fastify": "latest", "vite": "latest", "react": "latest", "react-dom": "latest", "zod": "latest" },
-  "devDependencies": { "@types/node": "latest", "@types/react": "latest", "@types/react-dom": "latest", "playwright": "latest", "tsx": "latest", "typescript": "latest" }
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "fastify": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "sharp": "^0.35.4",
+    "vite": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "playwright": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
 }

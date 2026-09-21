@@ -19,8 +19,8 @@ const longWordQuote='Electroencephalographically electroencephalographically ele
 
 export const contentFixtures: ContentFixture[] = [
   ...demoSlides.flatMap(slide => (['short','normal','near-limit','overflow'] as const).map(kind => ({template:slide.template,kind,slide:variant(slide,kind),expectsOverflow:kind==='overflow'}))),
-  {template:'T06',kind:'t06-real-overflow',slide:{...t06,quote:realQuote},expectsOverflow:false,expectsAutoFit:true},
-  {template:'T06',kind:'t06-near-editorial-limit',slide:{...t06,quote:nearEditorialLimitQuote},expectsOverflow:false,expectsAutoFit:true},
-  {template:'T06',kind:'t06-wordy-autofit',slide:{...t06,quote:wordyQuote},expectsOverflow:false,expectsAutoFit:true},
-  {template:'T06',kind:'t06-long-word-overflow',slide:{...t06,quote:longWordQuote},expectsOverflow:true},
+  {template:'T06',kind:'t06-real-overflow',slide:{...t06,quote:realQuote},expectsOverflow:true,expectsAutoFit:true},
+  {template:'T06',kind:'t06-near-editorial-limit',slide:{...t06,quote:nearEditorialLimitQuote},expectsOverflow:true,expectsAutoFit:true},
+  {template:'T06',kind:'t06-wordy-autofit',slide:{...t06,quote:wordyQuote},expectsOverflow:true,expectsAutoFit:true},
+  {template:'T06',kind:'t06-long-word-overflow',slide:{...t06,quote:longWordQuote},expectsOverflow:true,expectsAutoFit:true},
 ]

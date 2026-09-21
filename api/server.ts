@@ -4,15 +4,20 @@ import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { constants } from 'node:fs'
 import { resolve, relative, extname } from 'node:path'
 import { chromium } from 'playwright'
+import { z } from 'zod'
 import { carouselSchema } from '../src/schemas/carousel'
 import { carouselJsonSchema } from '../src/schemas/jsonSchema'
 import { renderCarousel, type RenderWarning } from '../src/renderer/renderCarousel'
+import { inspectImageUrl } from '../src/images/inspectImage'
+import { fitForTemplate, orientationFor, recommendedObjectPosition, type TemplateName } from '../src/renderer/imageMetrics'
 
 const app=Fastify({logger:true,trustProxy:true})
 const jobsRoot=resolve('output','jobs')
 const jobIdPattern=/^[0-9a-f-]{36}$/i
 const imageNamePattern=/^\d{2}\.png$/
 const instagramImageNamePattern=/^\d{2}\.jpg$/
+const imageInspectionSchema=z.object({url:z.string().url()}).strict()
+const imageScoreSchema=imageInspectionSchema.extend({template:z.enum(['T01','T02','T03','T04','T06','T07','T08','T09'])}).strict()
 const errors=(issues: {path:PropertyKey[];message:string;code:string}[]) => issues.map(issue=>({path:issue.path.join('.'),message:issue.message,code:issue.code}))
 const jobDirectory=(jobId:string) => resolve(jobsRoot,jobId)
 const insideJobs=(target:string) => { const path=relative(jobsRoot,target); return path !== '' && !path.startsWith('..') && !path.includes(':') }
@@ -36,6 +41,21 @@ async function exportPngAsJpeg(browser:Awaited<ReturnType<typeof chromium.launch
 
 app.get('/health',async()=>({status:'ok'}))
 app.get('/schema',async()=>carouselJsonSchema)
+
+app.post('/inspect-image',async(request,reply)=>{
+  const parsed=imageInspectionSchema.safeParse(request.body)
+  if (!parsed.success) return reply.code(400).send({valid:false,errors:errors(parsed.error.issues)})
+  try { return await inspectImageUrl(parsed.data.url) } catch (error) { request.log.warn(error,'image inspection failed'); return reply.code(400).send({valid:false,error:error instanceof Error ? error.message : 'No se pudo inspeccionar la imagen'}) }
+})
+
+app.post('/score-image',async(request,reply)=>{
+  const parsed=imageScoreSchema.safeParse(request.body)
+  if (!parsed.success) return reply.code(400).send({valid:false,errors:errors(parsed.error.issues)})
+  try {
+    const image=await inspectImageUrl(parsed.data.url)
+    return {...image,orientation:orientationFor(image.aspectRatio),templateFit:fitForTemplate(image.aspectRatio,parsed.data.template as TemplateName),recommendedObjectPosition:recommendedObjectPosition(image.aspectRatio,parsed.data.template as TemplateName)}
+  } catch (error) { request.log.warn(error,'image score failed'); return reply.code(400).send({valid:false,error:error instanceof Error ? error.message : 'No se pudo inspeccionar la imagen'}) }
+})
 
 app.post('/validate',async(request,reply)=>{
   const parsed=carouselSchema.safeParse(request.body)

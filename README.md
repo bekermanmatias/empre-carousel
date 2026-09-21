@@ -50,6 +50,8 @@ La API escucha en `http://127.0.0.1:3001` por defecto; definí `PORT` para cambi
 | GET | `/health` | Estado del servicio. |
 | POST | `/validate` | Valida el body Zod sin renderizar. |
 | POST | `/render` | Crea un job, renderiza y devuelve su estado. |
+| POST | `/inspect-image` | Descarga una imagen pública e informa dimensiones, MIME y tamaño. |
+| POST | `/score-image` | Calcula orientación, compatibilidad geométrica y posición sugerida para un template. |
 | GET | `/jobs/:jobId` | Devuelve metadata y `render-report.json`. |
 | GET | `/jobs/:jobId/files/:filename` | Sirve `NN.png` sólo para demo/desarrollo. |
 | POST | `/jobs/:jobId/export-instagram-assets` | Convierte los PNG del job a JPEG y devuelve sus URL públicas. |
@@ -84,7 +86,11 @@ Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el 
 
 ### Auto-fit controlado de T06
 
-La cita de T06 conserva su caja de 435×390 px. Si desborda con la tipografía editorial de 43 px, el renderer reduce sólo ese campo en pasos de 1 px hasta 36 px, preservando la proporción de `line-height`. El reporte agrega `autoFits` cuando logra resolverlo; si no entra al mínimo, el warning `overflow` sigue invalidando el slide. El fixture `examples/t06-real-overflow.json` verifica la cita real que requiere este ajuste.
+La cita de T06 conserva su caja de 435×390 px. Si desborda con la tipografía editorial de 43 px, el renderer reduce sólo ese campo en pasos de 1 px hasta 36.55 px (85%), preservando la proporción de `line-height`. El reporte agrega `autoFits` cuando logra resolverlo; si no entra al mínimo o supera sus 8 líneas, el warning `overflow` sigue invalidando el slide. El fixture `examples/t06-real-overflow.json` cubre la cita real de referencia.
+
+### Métricas visuales
+
+Cada slide de `render-report.json` incluye `textMetrics` por campo (`lineCount`, `scrollHeight`, `clientHeight`, `overflow`, `fontSizeUsed` y `autoFitApplied`) e `imageMetrics` cuando tiene imagen. Los límites de línea y la reducción acotada a un mínimo del 85% están centralizados por template. Los endpoints de imagen no usan análisis semántico: sólo descargan la URL, leen sus metadatos con Sharp y comparan su aspecto contra la caja del template.
 
 ## Exportar assets para Instagram
 
