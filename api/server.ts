@@ -10,6 +10,7 @@ import { carouselJsonSchema } from '../src/schemas/jsonSchema'
 import { renderCarousel, type RenderWarning } from '../src/renderer/renderCarousel'
 import { inspectImageUrl } from '../src/images/inspectImage'
 import { fitForTemplate, orientationFor, recommendedObjectPosition, type TemplateName } from '../src/renderer/imageMetrics'
+import { prepareImage, preparedImagePath, type PreparedImage } from '../src/images/prepareImage'
 
 const app=Fastify({logger:true,trustProxy:true})
 const jobsRoot=resolve('output','jobs')
@@ -18,6 +19,7 @@ const imageNamePattern=/^\d{2}\.png$/
 const instagramImageNamePattern=/^\d{2}\.jpg$/
 const imageInspectionSchema=z.object({url:z.string().url()}).strict()
 const imageScoreSchema=imageInspectionSchema.extend({template:z.enum(['T01','T02','T03','T04','T06','T07','T08','T09'])}).strict()
+const prepareImageSchema=imageScoreSchema.extend({objectPosition:z.string().optional()}).strict()
 const errors=(issues: {path:PropertyKey[];message:string;code:string}[]) => issues.map(issue=>({path:issue.path.join('.'),message:issue.message,code:issue.code}))
 const jobDirectory=(jobId:string) => resolve(jobsRoot,jobId)
 const insideJobs=(target:string) => { const path=relative(jobsRoot,target); return path !== '' && !path.startsWith('..') && !path.includes(':') }
@@ -57,6 +59,13 @@ app.post('/score-image',async(request,reply)=>{
   } catch (error) { request.log.warn(error,'image score failed'); return reply.code(400).send({valid:false,error:error instanceof Error ? error.message : 'No se pudo inspeccionar la imagen'}) }
 })
 
+app.post('/prepare-image',async(request,reply)=>{
+  const parsed=prepareImageSchema.safeParse(request.body)
+  if (!parsed.success) return reply.code(400).send({valid:false,errors:errors(parsed.error.issues)})
+  try { return await prepareImage(parsed.data.url,parsed.data.template,parsed.data.objectPosition,publicBaseUrl(request)) }
+  catch (error) { request.log.warn(error,'image preparation failed'); return reply.code(400).send({valid:false,sourceUrl:parsed.data.url,error:error instanceof Error ? error.message : 'No se pudo preparar la imagen'}) }
+})
+
 app.post('/validate',async(request,reply)=>{
   const parsed=carouselSchema.safeParse(request.body)
   if (!parsed.success) return reply.code(400).send({valid:false,errors:errors(parsed.error.issues)})
@@ -71,13 +80,30 @@ app.post('/render',async(request,reply)=>{
   await mkdir(directory,{recursive:true})
   await writeFile(resolve(directory,'input.json'),JSON.stringify(parsed.data,null,2)+'\n')
   try {
-    const report=await renderCarousel(parsed.data,directory,(index,position)=>`${String(position ?? index + 1).padStart(2,'0')}.png`)
+    const prepared: Array<PreparedImage|undefined>=[]
+    for (const slide of parsed.data.slides) {
+      if (!slide.image) { prepared.push(undefined); continue }
+      try { prepared.push(await prepareImage(slide.image.url,slide.template as TemplateName,slide.image.objectPosition,publicBaseUrl(request))) }
+      catch (error) {
+        const warning={field:'image',type:'image_load_error' as const,position:slide.position,url:slide.image.url,error:error instanceof Error ? error.message : 'image_prepare_error'}
+        await writeFile(resolve(directory,'render-report.json'),JSON.stringify({version:parsed.data.version,valid:false,slides:parsed.data.slides.map(candidate=>({template:candidate.template,position:candidate.position,valid:false,warnings:candidate===slide?[warning]:[],autoFits:[],textMetrics:[],imageMetrics:candidate===slide?{sourceUrl:slide.image!.url,loaded:false,error:warning.error}:undefined,dimensions:{width:1080,height:1350},file:`${String(candidate.position ?? 0).padStart(2,'0')}.png`}))},null,2)+'\n')
+        return reply.code(400).send({success:false,jobId,valid:false,slideCount:parsed.data.slides.length,files:[],warnings:[warning]})
+      }
+    }
+    const renderInput={...parsed.data,slides:parsed.data.slides.map((slide,index)=>slide.image && prepared[index] ? {...slide,image:{...slide.image,url:prepared[index].url,objectPosition:slide.image.objectPosition ?? prepared[index].recommendedObjectPosition}} : slide)}
+    const report=await renderCarousel(renderInput,directory,(index,position)=>`${String(position ?? index + 1).padStart(2,'0')}.png`,prepared)
     const warnings: (RenderWarning & {position?:number})[]=report.slides.flatMap(slide=>slide.warnings.map(warning=>({...warning,position:slide.position})))
     return {success:report.valid,jobId,valid:report.valid,slideCount:report.slides.length,files:report.slides.map(slide=>({position:slide.position,filename:slide.file})),warnings}
   } catch (error) {
     request.log.error(error,'render job failed')
     return reply.code(500).send({success:false,jobId,valid:false,slideCount:parsed.data.slides.length,files:[],warnings:[],error:'No se pudo completar el render'})
   }
+})
+
+app.get('/public/prepared/:filename',async(request,reply)=>{
+  const {filename}=request.params as {filename:string}
+  if (!/^[a-f0-9]{64}\.jpg$/i.test(filename)) return reply.code(400).send({error:'Ruta de archivo inválida'})
+  try { return reply.type('image/jpeg').send(await readFile(preparedImagePath(filename))) } catch { return reply.code(404).send({error:'Archivo no encontrado'}) }
 })
 
 app.get('/jobs/:jobId',async(request,reply)=>{

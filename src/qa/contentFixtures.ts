@@ -1,7 +1,7 @@
 import type { Slide } from '../schemas/templates'
 import { demoSlides } from '../demo/demoData'
 
-export type FixtureKind = 'short' | 'normal' | 'near-limit' | 'overflow' | 't06-real-overflow' | 't06-near-editorial-limit' | 't06-wordy-autofit' | 't06-long-word-overflow'
+export type FixtureKind = 'short' | 'normal' | 'near-limit' | 'overflow' | 't06-real-overflow' | 't06-near-editorial-limit' | 't06-wordy-autofit' | 't06-long-word-overflow' | 't08-near-divider' | 't08-autofit-divider' | 't08-divider-overflow'
 export type ContentFixture = { template:Slide['template']; kind:FixtureKind; slide:Slide; expectsOverflow:boolean; expectsAutoFit?:boolean }
 function variant(slide: Slide, kind: FixtureKind): Slide {
   const excess = Array.from({length:14}, (_, index) => `Test line ${index + 1}`).join('\n')
@@ -16,6 +16,7 @@ const realQuote='AI systems are getting more powerful, and they’re increasingl
 const nearEditorialLimitQuote=`${realQuote} Today.`
 const wordyQuote='AI is moving fast. We need clear rules, open research, strong testing, and public debate so progress serves people, not only the systems being built, in daily life and work.'
 const longWordQuote='Electroencephalographically electroencephalographically electroencephalographically electroencephalographically.'
+const t08=demoSlides.find((slide): slide is Extract<Slide,{template:'T08'}> => slide.template==='T08')!
 
 export const contentFixtures: ContentFixture[] = [
   ...demoSlides.flatMap(slide => (['short','normal','near-limit','overflow'] as const).map(kind => ({template:slide.template,kind,slide:variant(slide,kind),expectsOverflow:kind==='overflow'}))),
@@ -23,4 +24,7 @@ export const contentFixtures: ContentFixture[] = [
   {template:'T06',kind:'t06-near-editorial-limit',slide:{...t06,quote:nearEditorialLimitQuote},expectsOverflow:true,expectsAutoFit:true},
   {template:'T06',kind:'t06-wordy-autofit',slide:{...t06,quote:wordyQuote},expectsOverflow:true,expectsAutoFit:true},
   {template:'T06',kind:'t06-long-word-overflow',slide:{...t06,quote:longWordQuote},expectsOverflow:true,expectsAutoFit:true},
+  {template:'T08',kind:'t08-near-divider',slide:{...t08,body:'A compact body that ends before the divider.'},expectsOverflow:false},
+  {template:'T08',kind:'t08-autofit-divider',slide:{...t08,body:'A compact operational body with enough words to wrap carefully near the divider while preserving the required visual gap.'},expectsOverflow:false,expectsAutoFit:true},
+  {template:'T08',kind:'t08-divider-overflow',slide:{...t08,body:'This body is deliberately too long to clear the fixed divider while preserving the required visual gap between content and line.'},expectsOverflow:true,expectsAutoFit:true},
 ]

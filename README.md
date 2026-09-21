@@ -52,6 +52,8 @@ La API escucha en `http://127.0.0.1:3001` por defecto; definí `PORT` para cambi
 | POST | `/render` | Crea un job, renderiza y devuelve su estado. |
 | POST | `/inspect-image` | Descarga una imagen pública e informa dimensiones, MIME y tamaño. |
 | POST | `/score-image` | Calcula orientación, compatibilidad geométrica y posición sugerida para un template. |
+| POST | `/prepare-image` | Descarga una URL HTTP(S) pública, la normaliza a JPEG sRGB y devuelve una URL estable local. |
+| GET | `/public/prepared/:filename` | Sirve los JPEG normalizados que usa el renderer. |
 | GET | `/jobs/:jobId` | Devuelve metadata y `render-report.json`. |
 | GET | `/jobs/:jobId/files/:filename` | Sirve `NN.png` sólo para demo/desarrollo. |
 | POST | `/jobs/:jobId/export-instagram-assets` | Convierte los PNG del job a JPEG y devuelve sus URL públicas. |
@@ -82,7 +84,7 @@ Un render correcto devuelve:
 }
 ```
 
-Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. El servidor sólo acepta UUIDs y nombres `NN.png` en la ruta de archivos; no permite path traversal.
+Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. Antes de abrir Chromium, `/render` prepara internamente cada `image.url`: acepta sólo HTTP(S) público, controla redirects, timeout y 15 MB, valida el binario con Sharp y lo guarda como JPEG sRGB estable en `output/prepared/`. Una descarga 401/403/404, HTML o una imagen que no completa su carga devuelve `image_load_error` y el job queda inválido, sin screenshot de esa slide.
 
 ### Auto-fit controlado de T06
 
@@ -90,7 +92,7 @@ La cita de T06 conserva su caja de 435×390 px. Si desborda con la tipografía e
 
 ### Métricas visuales
 
-Cada slide de `render-report.json` incluye `textMetrics` por campo (`lineCount`, `scrollHeight`, `clientHeight`, `overflow`, `fontSizeUsed` y `autoFitApplied`) e `imageMetrics` cuando tiene imagen. Los límites de línea y la reducción acotada a un mínimo del 85% están centralizados por template. Los endpoints de imagen no usan análisis semántico: sólo descargan la URL, leen sus metadatos con Sharp y comparan su aspecto contra la caja del template.
+Cada slide de `render-report.json` incluye `textMetrics` por campo (`lineCount`, `scrollHeight`, `clientHeight`, `overflow`, `fontSizeUsed` y `autoFitApplied`) e `imageMetrics` cuando tiene imagen. Estas últimas incluyen `sourceUrl`, `preparedUrl`, `loaded`, dimensiones, MIME, tamaño y `templateFit`. Los límites de línea y la reducción acotada a un mínimo del 85% están centralizados por template. T08 reserva un margen de 20 px antes del divisor inferior; si el body no entra aun con auto-fit, emite `overflow` en vez de dejar que la línea lo atraviese.
 
 ## Exportar assets para Instagram
 

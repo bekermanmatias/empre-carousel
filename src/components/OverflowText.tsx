@@ -6,17 +6,20 @@ export type AutoFitConfig = {
   step: number
   preserveLineHeightRatio?: boolean
   maxLines?: number
+  /** Absolute slide Y coordinate; reserves visual clearance for a divider. */
+  maxBottom?: number
 }
 
 export type TextMetrics = {lineCount:number;scrollHeight:number;clientHeight:number;overflow:boolean;fontSizeUsed:number;autoFitApplied:boolean;maxLines?:number;originalFontSize?:number}
-const measure = (node:HTMLElement,maxLines?:number):TextMetrics => {
+const measure = (node:HTMLElement,maxLines?:number,maxBottom?:number):TextMetrics => {
   const styles=getComputedStyle(node)
   const fontSize=Number.parseFloat(styles.fontSize) || 0
   const lineHeight=Number.parseFloat(styles.lineHeight) || fontSize*1.2
   const range=document.createRange()
   range.selectNodeContents(node)
   const lineCount=Math.max(1,Math.round(range.getBoundingClientRect().height/lineHeight))
-  const overflow=node.scrollHeight > node.clientHeight + 1 || node.scrollWidth > node.clientWidth + 1 || (maxLines !== undefined && lineCount > maxLines)
+  const bottom=node.getBoundingClientRect().bottom
+  const overflow=node.scrollHeight > node.clientHeight + 1 || node.scrollWidth > node.clientWidth + 1 || (maxLines !== undefined && lineCount > maxLines) || (maxBottom !== undefined && bottom > maxBottom)
   return {lineCount,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight,overflow,fontSizeUsed:fontSize,autoFitApplied:false,maxLines}
 }
 
@@ -29,7 +32,7 @@ export function OverflowText({ children, className = '', field, autoFit }: { chi
     if (!node) return
     node.style.removeProperty('font-size')
     node.style.removeProperty('line-height')
-    const initial=measure(node,autoFit?.maxLines)
+    const initial=measure(node,autoFit?.maxLines,autoFit?.maxBottom)
     if (!autoFit || !initial.overflow) {
       setStatus(initial)
       if (initial.overflow) console.warn(`Empre Carousel: overflow detected in ${field || className || 'text box'}`)
@@ -48,9 +51,9 @@ export function OverflowText({ children, className = '', field, autoFit }: { chi
       node.style.fontSize=`${size}px`
       if (lineHeightRatio) node.style.lineHeight=`${lineHeightRatio*size}px`
       finalFontSize=size
-      if (!measure(node,autoFit.maxLines).overflow) { resolved=true; break }
+      if (!measure(node,autoFit.maxLines,autoFit.maxBottom).overflow) { resolved=true; break }
     }
-    const final=measure(node,autoFit.maxLines)
+    const final=measure(node,autoFit.maxLines,autoFit.maxBottom)
     setStatus({...final,autoFitApplied:true,originalFontSize:autoFit.defaultFontSize})
     if (!resolved) console.warn(`Empre Carousel: overflow detected in ${field || className || 'text box'} after auto-fit`)
   },[children,className,field,autoFit])

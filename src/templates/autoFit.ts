@@ -25,7 +25,12 @@ export const TEXT_FIELD_CONFIG: Record<string,Record<string,AutoFitConfig>> = {
     title: {defaultFontSize:51,minFontSize:44,step:1,preserveLineHeightRatio:true,maxLines:3},
     body: {defaultFontSize:23,minFontSize:20,step:1,preserveLineHeightRatio:true,maxLines:5},
   },
-  T08: {},
+  // T08 body must clear its fixed divider at y=865 by 20 px. The natural-height
+  // box lets the same auto-fit measurement reject text that would cross it.
+  T08: {
+    title: {defaultFontSize:51,minFontSize:44,step:1,preserveLineHeightRatio:true,maxLines:3},
+    body: {defaultFontSize:23,minFontSize:20,step:1,preserveLineHeightRatio:true,maxLines:5,maxBottom:845},
+  },
   T06: {quote:T06_QUOTE_AUTO_FIT,context:{defaultFontSize:21,minFontSize:18,step:1,preserveLineHeightRatio:true,maxLines:3}},
   T09: {
     title: {defaultFontSize:48,minFontSize:41,step:1,preserveLineHeightRatio:true,maxLines:2},
@@ -37,6 +42,5 @@ export const TEXT_FIELD_CONFIG: Record<string,Record<string,AutoFitConfig>> = {
 // T04/T07 and T08 use the same visual field sizes as their sibling layouts.
 TEXT_FIELD_CONFIG.T04=TEXT_FIELD_CONFIG.T02
 TEXT_FIELD_CONFIG.T07=TEXT_FIELD_CONFIG.T02
-TEXT_FIELD_CONFIG.T08=TEXT_FIELD_CONFIG.T03
 
 export const textConfig = (template:string,field:string) => TEXT_FIELD_CONFIG[template]?.[field]

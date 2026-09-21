@@ -7,3 +7,7 @@
 .t09 .inner-frame { inset:37px }.t09__number { position:absolute; top:85px; left:50%; transform:translateX(-50%) }.arrow { position:absolute; top:130px; left:50%; transform:translateX(-50%); font-size:55px; font-weight:300 }.t09__copy { position:absolute; left:164px; top:275px; width:760px }.t09__copy .headline { height:130px; font-size:48px }.t09__copy .divider { margin:26px 0 }.t09__copy .body { height:125px }.t09__copy .highlight { height:100px; font-size:23px }.t09__image { position:absolute; left:164px; bottom:210px; width:760px; height:270px }.t09__logo { position:absolute; left:50%; bottom:72px; transform:translateX(-50%) }.t09__signature { position:absolute; bottom:41px; left:0; width:100%; text-align:center; color:#bbb; font-size:14px; letter-spacing:2px }
 .horizontal__copy .body { height:160px }
 .summary, .body, .headline, .highlight, .quote, .context { white-space:pre-line }
+.image-slot { position:absolute }
+.image-slot__error { width:100%; height:100%; background:#8a3030 }
+.t08 .horizontal__copy .headline { margin-bottom:0 }
+.t08 .horizontal__copy .body { height:auto; max-height:160px }
