@@ -284,7 +284,7 @@
               "quote": {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 360
+                "maxLength": 180
               },
               "context": {
                 "type": "string",

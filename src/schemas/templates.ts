@@ -7,7 +7,9 @@ export const t01Schema = z.object({ template:z.literal('T01'), ...positioned, ti
 export const t02Schema = z.object({ template:z.literal('T02'), ...positioned, section:text(40), title:text(180), body:text(520), highlight:text(180), image:imageSchema }).strict()
 export const t03Schema = z.object({ template:z.literal('T03'), ...positioned, title:text(200), body:text(520), image:imageSchema }).strict()
 export const t04Schema = z.object({ template:z.literal('T04'), ...positioned, section:text(40), title:text(180), body:text(520), highlight:text(180), image:imageSchema }).strict()
-export const t06Schema = z.object({ template:z.literal('T06'), ...positioned, section:text(40), quote:text(360), context:text(200), image:imageSchema }).strict()
+// Chromium QA shows ordinary quotes around 166 characters fit with bounded auto-fit,
+// while wordier copy near 200 characters can exceed the fixed T06 quote box.
+export const t06Schema = z.object({ template:z.literal('T06'), ...positioned, section:text(40), quote:text(180), context:text(200), image:imageSchema }).strict()
 export const t07Schema = z.object({ template:z.literal('T07'), ...positioned, section:text(40), title:text(180), body:text(520), highlight:text(180), image:imageSchema }).strict()
 export const t08Schema = z.object({ template:z.literal('T08'), ...positioned, title:text(200), body:text(520), image:imageSchema }).strict()
 export const t09Schema = z.object({ template:z.literal('T09'), ...positioned, title:text(180), body:text(340), highlight:text(180).optional(), image:imageSchema.optional(), signature:text(100).optional() }).strict()

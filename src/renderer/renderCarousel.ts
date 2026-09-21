@@ -6,7 +6,8 @@ import { createServer as createViteServer } from 'vite'
 import type { Carousel } from '../schemas/carousel'
 
 export type RenderWarning = { field:string; type:'overflow' }
-export type SlideReport = { template:string; position?:number; valid:boolean; warnings:RenderWarning[]; dimensions:{width:number;height:number}; file:string }
+export type AutoFitReport = { field:string; autoFitApplied:true; originalFontSize:number; finalFontSize:number; overflow:false }
+export type SlideReport = { template:string; position?:number; valid:boolean; warnings:RenderWarning[]; autoFits:AutoFitReport[]; dimensions:{width:number;height:number}; file:string }
 export type RenderReport = { version:'1'; valid:boolean; slides:SlideReport[] }
 
 export async function renderCarousel(carousel: Carousel, outputDirectory: string, fileName: (index:number, position?:number, template?:string) => string): Promise<RenderReport> {
@@ -23,10 +24,10 @@ export async function renderCarousel(carousel: Carousel, outputDirectory: string
       const page=await browser.newPage({viewport:{width:1080,height:1350},deviceScaleFactor:1})
       await page.goto(`http://127.0.0.1:${address.port}/?slide=${encodeURIComponent(JSON.stringify(slide))}`,{waitUntil:'networkidle'})
       await page.evaluate(async()=>{await document.fonts.ready})
-      const measured=await page.evaluate(() => { const root=document.querySelector('.slide')!; const rect=root.getBoundingClientRect(); const warnings=[...document.querySelectorAll<HTMLElement>('.has-overflow')].map(node=>({field:node.dataset.overflowField ?? 'unknown',type:'overflow' as const})); return {warnings,dimensions:{width:Math.round(rect.width),height:Math.round(rect.height)}} })
+      const measured=await page.evaluate(() => { const root=document.querySelector('.slide')!; const rect=root.getBoundingClientRect(); const warnings=[...document.querySelectorAll<HTMLElement>('.has-overflow')].map(node=>({field:node.dataset.overflowField ?? 'unknown',type:'overflow' as const})); const autoFits=[...document.querySelectorAll<HTMLElement>('[data-auto-fit-applied="true"]')].filter(node=>node.dataset.overflowStatus==='fitted').map(node=>({field:node.dataset.overflowField ?? 'unknown',autoFitApplied:true as const,originalFontSize:Number(node.dataset.originalFontSize),finalFontSize:Number(node.dataset.finalFontSize),overflow:false as const})); return {warnings,autoFits,dimensions:{width:Math.round(rect.width),height:Math.round(rect.height)}} })
       const file=fileName(index,slide.position,slide.template)
       await page.screenshot({path:resolve(outputDirectory,file),clip:{x:0,y:0,width:1080,height:1350}})
-      slides.push({template:slide.template,position:slide.position,valid:measured.warnings.length===0 && measured.dimensions.width===1080 && measured.dimensions.height===1350,warnings:measured.warnings,dimensions:measured.dimensions,file})
+      slides.push({template:slide.template,position:slide.position,valid:measured.warnings.length===0 && measured.dimensions.width===1080 && measured.dimensions.height===1350,warnings:measured.warnings,autoFits:measured.autoFits,dimensions:measured.dimensions,file})
       await page.close()
     }
   } finally {

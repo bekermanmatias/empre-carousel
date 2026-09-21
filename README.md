@@ -33,7 +33,7 @@ El body es un objeto estricto con `version: "1"` y entre 1 y 10 `slides`. Cada s
 }
 ```
 
-Límites: T01 título 180/resumen 260; T02/T04/T07 sección 40, título 180, cuerpo 520, destacado 180; T03/T08 título 200/cuerpo 520; T06 sección 40, cita 360/contexto 200; T09 título 180/cuerpo 340/destacado 180. El navegador también mide overflow real: no reduce la fuente, emite un warning y marca el render inválido.
+Límites: T01 título 180/resumen 260; T02/T04/T07 sección 40, título 180, cuerpo 520, destacado 180; T03/T08 título 200/cuerpo 520; T06 sección 40, cita 180/contexto 200; T09 título 180/cuerpo 340/destacado 180. El navegador mide overflow real: T06 puede aplicar un auto-fit acotado a la cita; los demás campos emiten un warning y marcan el render inválido.
 
 ## API HTTP para n8n
 
@@ -81,6 +81,10 @@ Un render correcto devuelve:
 ```
 
 Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. El servidor sólo acepta UUIDs y nombres `NN.png` en la ruta de archivos; no permite path traversal.
+
+### Auto-fit controlado de T06
+
+La cita de T06 conserva su caja de 435×390 px. Si desborda con la tipografía editorial de 43 px, el renderer reduce sólo ese campo en pasos de 1 px hasta 36 px, preservando la proporción de `line-height`. El reporte agrega `autoFits` cuando logra resolverlo; si no entra al mínimo, el warning `overflow` sigue invalidando el slide. El fixture `examples/t06-real-overflow.json` verifica la cita real que requiere este ajuste.
 
 ## Exportar assets para Instagram
 
