@@ -1,0 +1,23 @@
+{
+  "name": "empre-carousel",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "generate:schema": "tsx scripts/generate-schema.ts",
+    "predev": "npm run generate:schema",
+    "dev": "vite",
+    "prebuild": "npm run generate:schema",
+    "build": "tsc -b && vite build",
+    "check": "tsc -b --pretty false",
+    "render": "tsx scripts/render.ts",
+    "render:demo": "tsx scripts/render.ts examples/carousel.json",
+    "test:content": "tsx scripts/test-content.ts",
+    "preapi": "npm run generate:schema",
+    "api": "tsx api/server.ts",
+    "preapi:dev": "npm run generate:schema",
+    "api:dev": "tsx watch api/server.ts"
+  },
+  "dependencies": { "@vitejs/plugin-react": "latest", "fastify": "latest", "vite": "latest", "react": "latest", "react-dom": "latest", "zod": "latest" },
+  "devDependencies": { "@types/node": "latest", "@types/react": "latest", "@types/react-dom": "latest", "playwright": "latest", "tsx": "latest", "typescript": "latest" }
+}

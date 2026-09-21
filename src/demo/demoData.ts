@@ -1,0 +1,12 @@
+import type { Slide } from '../schemas/templates'
+const image = { url:'/demo/market.svg', objectPosition:'50% 50%', alt:'Paisaje abstracto' }
+export const demoSlides: Slide[] = [
+ {template:'T01',position:1,slideNumber:'01 / 09',title:'Un nuevo modelo está cambiando el mercado',summary:'La compañía anunció una estrategia que puede transformar la forma en que el sector compite.',image},
+ {template:'T02',position:2,slideNumber:'02 / 09',section:'CONTEXTO',title:'La oportunidad detrás del cambio',body:'El mercado venía mostrando señales de madurez: clientes más exigentes y modelos tradicionales con menor margen.',highlight:'El nuevo escenario premia a quienes toman decisiones antes que el resto.',image:{...image,objectPosition:'25% 50%'}},
+ {template:'T03',position:3,slideNumber:'03 / 09',title:'Una propuesta enfocada en valor',body:'La estrategia combina producto, tecnología y una operación más liviana. El objetivo no es crecer por crecer: es entregar una experiencia relevante en cada punto de contacto.',image},
+ {template:'T04',position:4,slideNumber:'04 / 09',section:'CONTEXTO',title:'Por qué ahora es el momento',body:'La adopción acelerada de herramientas digitales redujo barreras y abrió espacio para nuevos jugadores.',highlight:'La velocidad de ejecución será tan importante como la idea.',image:{...image,objectPosition:'72% 50%'}},
+ {template:'T06',position:6,slideNumber:'06 / 09',section:'VOCES',quote:'Innovar es entender al cliente antes que los demás.',context:'Una mirada sobre las decisiones que separan a las empresas que lideran de las que reaccionan.',image:{...image,objectPosition:'72% 50%'}},
+ {template:'T07',position:7,slideNumber:'07 / 09',section:'CONTEXTO',title:'¿Qué cambia para los equipos?',body:'Las organizaciones deberán trabajar con información más cercana al cliente y ciclos de prueba más cortos.',highlight:'La capacidad de aprender rápido se vuelve una ventaja competitiva.',image:{...image,objectPosition:'32% 50%'}},
+ {template:'T08',position:8,slideNumber:'08 / 09',title:'El desafío ya está sobre la mesa',body:'No alcanza con adoptar una nueva tecnología. La diferencia aparece cuando la estrategia, las personas y la ejecución se alinean para convertir una oportunidad en resultados sostenibles.',image},
+ {template:'T09',position:9,slideNumber:'09 / 09',title:'El próximo movimiento empieza hoy',body:'Las empresas que diseñen su respuesta ahora podrán llegar primero a una nueva etapa del mercado.',highlight:'Seguí las ideas que mueven a quienes construyen el futuro.',image,signature:'EMPRE MANAGEMENT'}
+]

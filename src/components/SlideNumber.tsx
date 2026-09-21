@@ -1,0 +1,1 @@
+export function SlideNumber({ value, className = '' }: { value: string; className?: string }) { const [current, total] = value.split('/').map(s => s.trim()); return <div className={`slide-number ${className}`}><b>{current}</b><span> / </span><em>{total}</em></div> }

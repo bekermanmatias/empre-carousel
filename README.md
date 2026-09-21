@@ -1,1 +1,104 @@
-# empre-carousel
+# Empre Carousel
+
+Renderer determinístico de ocho plantillas de Empre Management. Los templates son React/CSS y las PNG de `references/` sólo se usan en el comparador visual, nunca como fondo de un render.
+
+## Desarrollo y QA
+
+```bash
+npm install
+npm run dev
+npm run check
+npm run test:content
+npm run render:demo
+npm run render -- examples/demo-real.json
+```
+
+Los PNG de demo se escriben en `output/`; el carrusel real se escribe en `output/demo-real/`. Cada render genera un `render-report.json` con dimensiones, warnings de overflow y validez por slide.
+
+## Contrato de entrada
+
+El body es un objeto estricto con `version: "1"` y entre 1 y 10 `slides`. Cada slide es una unión discriminada por `template`; `position`, si existe, debe ser única. La imagen tiene el formato `image: { url, objectPosition?, alt? }`.
+
+```json
+{
+  "version": "1",
+  "slides": [{
+    "template": "T01",
+    "position": 1,
+    "slideNumber": "01 / 09",
+    "title": "Un título editorial",
+    "summary": "Una bajada breve.",
+    "image": { "url": "/imagen.jpg", "objectPosition": "50% 30%", "alt": "Descripción" }
+  }]
+}
+```
+
+Límites: T01 título 180/resumen 260; T02/T04/T07 sección 40, título 180, cuerpo 520, destacado 180; T03/T08 título 200/cuerpo 520; T06 sección 40, cita 360/contexto 200; T09 título 180/cuerpo 340/destacado 180. El navegador también mide overflow real: no reduce la fuente, emite un warning y marca el render inválido.
+
+## API HTTP para n8n
+
+```bash
+npm run api
+# desarrollo con reinicio automático
+npm run api:dev
+```
+
+La API escucha en `http://127.0.0.1:3001` por defecto; definí `PORT` para cambiarlo.
+
+| Método | Ruta | Función |
+| --- | --- | --- |
+| GET | `/health` | Estado del servicio. |
+| POST | `/validate` | Valida el body Zod sin renderizar. |
+| POST | `/render` | Crea un job, renderiza y devuelve su estado. |
+| GET | `/jobs/:jobId` | Devuelve metadata y `render-report.json`. |
+| GET | `/jobs/:jobId/files/:filename` | Sirve `NN.png` sólo para demo/desarrollo. |
+| POST | `/jobs/:jobId/export-instagram-assets` | Convierte los PNG del job a JPEG y devuelve sus URL públicas. |
+| GET | `/public/jobs/:jobId/instagram/:filename` | Sirve un asset JPEG exportado para Instagram. |
+
+```bash
+curl http://localhost:3001/health
+
+curl -X POST http://localhost:3001/validate \
+  -H "Content-Type: application/json" \
+  --data @examples/api-request.json
+
+curl -X POST http://localhost:3001/render \
+  -H "Content-Type: application/json" \
+  --data @examples/api-request.json
+```
+
+Un render correcto devuelve:
+
+```json
+{
+  "success": true,
+  "jobId": "uuid",
+  "valid": true,
+  "slideCount": 8,
+  "files": [{ "position": 1, "filename": "01.png" }],
+  "warnings": []
+}
+```
+
+Cada job queda aislado en `output/jobs/<jobId>/` con `input.json`, sus PNG y el reporte. El servidor sólo acepta UUIDs y nombres `NN.png` en la ruta de archivos; no permite path traversal.
+
+## Exportar assets para Instagram
+
+Una vez que el render terminó, exportá sus slides como JPEG con:
+
+```bash
+curl -X POST http://localhost:3001/jobs/<jobId>/export-instagram-assets
+```
+
+Los archivos se escriben en `output/jobs/<jobId>/instagram/` y quedan disponibles en
+`/public/jobs/<jobId>/instagram/NN.jpg`. Para que las URL devueltas sean las del dominio
+público del renderer, definí `PUBLIC_BASE_URL=https://render.empre.ar` en el VPS. Si no
+está definido, la API usa el protocolo y host de la request. Los JPEG se generan a 1080×1350
+con calidad 95 y fondo blanco para cualquier transparencia del PNG.
+
+## Docker local
+
+```bash
+docker build -t empre-carousel-api .
+docker run --rm -p 3001:3001 empre-carousel-api
+```

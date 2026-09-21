@@ -1,0 +1,2 @@
+export type ImageSlotProps = { imageUrl?: string; objectPosition?: string; alt?: string; className?: string }
+export function ImageSlot({ imageUrl, objectPosition = '50% 50%', alt = '', className = '' }: ImageSlotProps) { return <div className={`image-slot ${className}`}>{imageUrl ? <img src={imageUrl} alt={alt} style={{ objectPosition }} /> : <div className="image-slot__empty" aria-label="Imagen pendiente" />}</div> }

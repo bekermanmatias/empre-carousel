@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "slides": [
+    {"template":"T01","position":1,"slideNumber":"01 / 09","title":"NexoLog invierte US$18M y expande su red","summary":"La empresa abrirá dos centros de distribución y duplicará su capacidad de entregas en 24 horas.","image":{"url":"/demo/market.svg","objectPosition":"50% 45%","alt":"Red logística abstracta"}},
+    {"template":"T02","position":2,"slideNumber":"02 / 09","section":"CONTEXTO","title":"Una demanda que dejó de ser local","body":"El comercio electrónico de ciudades intermedias crece más rápido que la infraestructura disponible.","highlight":"NexoLog busca anticiparse a esa brecha.","image":{"url":"/demo/market.svg"}},
+    {"template":"T03","position":3,"slideNumber":"03 / 09","title":"Dos centros para reducir distancias","body":"Las nuevas operaciones cubrirán 14 provincias con rutas nocturnas y entregas de alta rotación.","image":{"url":"/demo/market.svg"}},
+    {"template":"T04","position":4,"slideNumber":"04 / 09","section":"MODELO","title":"La inversión también cambia la operación","body":"El plan integra clasificación automatizada, previsión de demanda y socios locales.","highlight":"La escala requiere datos y coordinación.","image":{"url":"/demo/market.svg"}},
+    {"template":"T06","position":6,"slideNumber":"06 / 09","section":"VOCES","quote":"La logística hoy define la promesa de una marca.","context":"Sofía Herrera, directora ejecutiva de NexoLog.","image":{"url":"/demo/market.svg"}},
+    {"template":"T07","position":7,"slideNumber":"07 / 09","section":"IMPACTO","title":"¿Qué significa para los comercios?","body":"Los vendedores podrán ofrecer plazos previsibles sin construir una operación propia.","highlight":"La distribución se vuelve una herramienta comercial.","image":{"url":"/demo/market.svg"}},
+    {"template":"T08","position":8,"slideNumber":"08 / 09","title":"El reto será sostener la promesa","body":"NexoLog deberá integrar tecnología, equipos y socios mientras protege su nivel de servicio.","image":{"url":"/demo/market.svg"}},
+    {"template":"T09","position":9,"slideNumber":"09 / 09","title":"La próxima entrega puede cambiar el mapa","body":"La logística regional ya es una pieza central de la competencia empresarial.","highlight":"Seguí las historias que construyen negocios del futuro.","image":{"url":"/demo/market.svg"},"signature":"EMPRE MANAGEMENT"}
+  ]
+}

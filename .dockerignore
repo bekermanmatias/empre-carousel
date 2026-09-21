@@ -1,0 +1,9 @@
+.git
+.github
+node_modules
+dist
+output
+*.tsbuildinfo
+.env
+.env.*
+!.env.example

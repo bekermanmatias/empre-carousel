@@ -1,0 +1,523 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "slides": {
+      "minItems": 1,
+      "maxItems": 10,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T01"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 260
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "title",
+              "summary",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T02"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "section": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 520
+              },
+              "highlight": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "section",
+              "title",
+              "body",
+              "highlight",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T03"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 520
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "title",
+              "body",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T04"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "section": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 520
+              },
+              "highlight": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "section",
+              "title",
+              "body",
+              "highlight",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T06"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "section": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "quote": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 360
+              },
+              "context": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "section",
+              "quote",
+              "context",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T07"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "section": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 520
+              },
+              "highlight": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "section",
+              "title",
+              "body",
+              "highlight",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T08"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 520
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "title",
+              "body",
+              "image"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template": {
+                "type": "string",
+                "const": "T09"
+              },
+              "slideNumber": {
+                "type": "string",
+                "pattern": "^\\d{2}\\s*\\/\\s*\\d{2}$"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 340
+              },
+              "highlight": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "objectPosition": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 180
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              },
+              "signature": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "template",
+              "slideNumber",
+              "title",
+              "body"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "slides"
+  ],
+  "additionalProperties": false
+}
